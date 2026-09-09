@@ -247,6 +247,8 @@
         getBase64Comprimido(document.getElementById('fotoNovedad').files[0], b64Nov => {
           
           let respuestas = {};
+          
+          // Fuerza el N/A a cualquier elemento dentro de un div con clase 'oculto'
           document.querySelectorAll('select').forEach(sel => {
             if (sel.id.includes('[')) {
               if (sel.closest('.oculto')) {
@@ -257,6 +259,12 @@
             }
           });
 
+          // Función para limpiar campos estáticos ocultos
+          const checkOculto = (id) => {
+            const el = document.getElementById(id);
+            return el.closest('.oculto') ? 'N/A' : (el.value || 'N/A');
+          };
+
           const registro = {
             id: Date.now(),
             email: document.getElementById('email').value,
@@ -264,11 +272,11 @@
             obra: document.getElementById('obra').value,
             tipoActivo: document.getElementById('tipoActivo').value,
             placa: document.getElementById('placa').value,
-            equipoAdicional: document.getElementById('equipoAdicional').value,
-            marcaRemolque: document.getElementById('marcaRemolque').value,
-            placaRemolque: document.getElementById('placaRemolque').value,
+            equipoAdicional: checkOculto('equipoAdicional'),
+            marcaRemolque: checkOculto('marcaRemolque'),
+            placaRemolque: checkOculto('placaRemolque'),
             estado: document.getElementById('estado').value,
-            novedades: document.getElementById('novedades').value,
+            novedades: document.getElementById('novedades').value || 'N/A',
             fotoOdometro: b64Odo, fotoHorometro: b64Horo, fotoNovedad: b64Nov,
             inspeccion: respuestas
           };
@@ -309,12 +317,9 @@
         localStorage.setItem('ft230_data', JSON.stringify(pendientes));
         actualizarEstado(); 
         sincronizarDatos();
-      } else {
-        console.error("Respuesta del servidor:", json);
-        alert("Error en Apps Script: " + (json.error || "Revisa la consola"));
       }
     } catch (err) {
-      console.error("Fallo de red o CORS:", err);
+      console.error("Fallo de sincronización:", err);
     } finally { 
       sincro = false; 
     }
