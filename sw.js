@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ft230-v1';
+const CACHE_NAME = 'ft230-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
