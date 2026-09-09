@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pre-Uso Vehículos FT-230</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 15px; background-color: #f4f4f9; margin: 0; }
+    .container { max-width: 650px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #333; font-size: 20px; margin-top: 0; }
+    label { font-weight: bold; display: block; margin-top: 15px; font-size: 14px; }
+    input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    button { width: 100%; padding: 15px; margin-top: 25px; background-color: #0056b3; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:disabled { background-color: #6c8ebf; cursor: not-allowed; }
+    .status { margin-bottom: 15px; padding: 10px; text-align: center; border-radius: 4px; font-weight: bold; font-size: 14px; }
+    .online { background-color: #d4edda; color: #155724; }
+    .offline { background-color: #f8d7da; color: #721c24; }
+    .seccion { margin-top: 10px; background: #e9ecef; padding: 12px; border-radius: 5px; cursor: pointer; }
+    summary { font-weight: bold; font-size: 15px; }
+    .oculto { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="statusBanner" class="status offline">Sin internet. Modo Offline.</div>
+
+  <h2>Pre-Uso Vehículos FT-230</h2>
+  <form id="formFT230">
+
+    <label>Correo electrónico *</label>
+    <input type="email" id="email" required autocomplete="off">
+
+    <label>Nombre del Conductor / Operador *</label>
+    <input type="text" id="operador" required autocomplete="off">
+
+    <label>Obra y/o Proyecto *</label>
+    <select id="obra" required>
+      <option value="">Seleccione...</option>
+      <option value="1. ALUMBRADO BYC">1. ALUMBRADO BYC</option>
+      <option value="2. ALUMBRADO STD">2. ALUMBRADO STD</option>
+      <option value="3. OF. BGA">3. OF. BGA</option>
+      <option value="4. ORIENTE (Rubiales - Caño sur - Gaitán)">4. ORIENTE (Rubiales - Caño sur - Gaitán)</option>
+      <option value="5. LLANOS (Villavicencio - Acacías - Castilla)">5. LLANOS (Villavicencio - Acacías - Castilla)</option>
+      <option value="6. REFINERÍA">6. REFINERÍA</option>
+    </select>
+
+    <label>Tipo de Activo *</label>
+    <select id="tipoActivo" required onchange="manejarTipoActivo()">
+      <option value="">Seleccione...</option>
+      <option value="CAMIONETA">CAMIONETA</option>
+      <option value="CAMIÓN">CAMIÓN</option>
+      <option value="BUS">BUS</option>
+      <option value="TRACTOCAMIÓN">TRACTOCAMIÓN</option>
+      <option value="MOTOCICLETA">MOTOCICLETA</option>
+    </select>
+
+    <div id="boxPlaca" class="oculto">
+      <label>Placa *</label>
+      <select id="placa" required></select>
+    </div>
+
+    <label>Foto Kilometraje Inicial *</label>
+    <input type="file" id="fotoOdometro" accept="image/*" capture="environment" required>
+
+    <label>Foto Horómetro Inicial (Opcional)</label>
+    <input type="file" id="fotoHorometro" accept="image/*" capture="environment">
+
+    <div id="seccionInspeccionVehiculo" class="oculto">
+      <h3 style="margin-top:25px; border-bottom:2px solid #ccc;">INSPECCIÓN VEHÍCULO</h3>
+      <div id="preguntasVehiculo"></div>
+      
+      <label style="margin-top:20px;">Equipo Adicional *</label>
+      <select id="equipoAdicional" onchange="manejarEquipoAdicional()">
+        <option value="N/A">N/A</option>
+        <option value="GRÚA / CANASTA">GRÚA / CANASTA</option>
+        <option value="SEMIREMOLQUE">SEMIREMOLQUE</option>
+      </select>
+
+      <div id="boxMarcaGrua" class="oculto">
+        <label>Marca Grúa/Canasta</label>
+        <select id="marcaRemolque">
+          <option value="">Seleccione...</option>
+          <option value="BONFIGLIOLI">BONFIGLIOLI</option>
+          <option value="FASSI">FASSI</option>
+          <option value="PALFINGER">PALFINGER</option>
+          <option value="TEREX">TEREX</option>
+          <option value="COMET">COMET</option>
+          <option value="AMCO VEBA">AMCO VEBA</option>
+          <option value="OTRO">OTRO</option>
+        </select>
+      </div>
+
+      <div id="boxPlacaRemolque" class="oculto">
+        <label>Placa Semiremolque</label>
+        <select id="placaRemolque">
+          <option value="">Seleccione...</option>
+          <option value="R23925">R23925</option>
+          <option value="R79344">R79344</option>
+          <option value="S27588">S27588</option>
+          <option value="S47243">S47243</option>
+          <option value="S60190">S60190</option>
+        </select>
+      </div>
+
+      <div id="preguntasAdicionales" class="oculto"></div>
+    </div>
+
+    <div id="seccionInspeccionMoto" class="oculto">
+      <h3 style="margin-top:25px; border-bottom:2px solid #ccc;">INSPECCIÓN MOTOCICLETA</h3>
+      <div id="preguntasMoto"></div>
+    </div>
+
+    <div id="cierreInspeccion" class="oculto">
+      <label style="margin-top:20px;">Detalle Estado del Vehículo *</label>
+      <select id="estado" required>
+        <option value="(OK) CORRECTO">(OK) CORRECTO</option>
+        <option value="CON NOVEDAD">CON NOVEDAD</option>
+      </select>
+
+      <label>Novedades encontradas (Mecánico, Pintura, etc.)</label>
+      <textarea id="novedades" rows="3"></textarea>
+
+      <label>Foto de la novedad (Opcional)</label>
+      <input type="file" id="fotoNovedad" accept="image/*" capture="environment">
+
+      <button type="submit" id="btnEnviar">Guardar Inspección</button>
+    </div>
+
+  </form>
+
+  <p style="text-align:center; font-size:12px; margin-top:15px;">Registros pendientes: <span id="contador">0</span></p>
+</div>
+
+<script>
+  // ¡IMPORTANTE! REEMPLAZA ESTA URL POR LA NUEVA URL PUBLICADA DE TU APPS SCRIPT FT-230
+  const URL_APPS_SCRIPT = "https://script.google.com/macros/s/TU_NUEVO_ID/exec";
+
+  const dataPlacas = {
+    "CAMIONETA": ["DVK647","FSM363","GYW338","KGA895","KGA899","KGA902","KGA905","KGA906","LWZ227","LWZ228","LWZ229","MUS482","QFO197","QFR672"],
+    "CAMIÓN": ["FSK827","FSU363","FSV904","GQU837","GQW353","IRP822","IRP848","LPK420","SKO752","SRR837","TAO476","TTW858","TTW862","WFD819","WFG409","WFG515","WFG516","WOL056","WOL161","WON441","WLY924"],
+    "BUS": ["TAQ796","TTW735"],
+    "TRACTOCAMIÓN": ["SRX290","SXR785","TTS277"],
+    "MOTOCICLETA": ["JSD83F","WDR95A"]
+  };
+
+  const pregVehiculo = {
+    "LUCES": ["[De Trabajo frontal (altas/bajas)]", "[Direccionales delanteras de parqueo / giro]", "[Direccionales traseras de parqueo / giro]", "[De Stop y señal trasera]", "[Exploradoras]"],
+    "CABINA": ["[Espejo central convexo]", "[Espejos Laterales]", "[Alarma de retroceso]", "[Pito]", "[Freno de Servicio]", "[Freno de Parqueo]", "[Barra de Dirección]", "[Cinturón de Seguridad (en cada Asiento)]", "[Puertas]", "[Vidrio Frontal]", "[Plumillas / Nivel de agua]", "[Indicadores (hidráulico - refrigerante - velocímetro)]", "[Iluminación cabina]", "[Pasamanos de acceso a la unidad tractora]", "[Interruptor eléctrico central o master]"],
+    "ESTADO MECÁNICO": ["[Control de Fugas Hidráulica]", "[Correas de motor]", "[Prueba de frenos (servicio y emergencias)]", "[Terminales de la Dirección]", "[Caja de Cambios]", "[Batería y cables en buen estado]", "[Nivel de Fluidos (hidráulico - refrigerante - frenos)]", "[Exhosto cubierto con aislamiento del tanque]"],
+    "LLANTAS": ["[En buen estado huella mínima de 3mm]", "[No se evidencian cortaduras profundas]", "[No se evidencian abultamientos]", "[Quinta Rueda]"],
+    "DOCUMENTOS": ["[Licencia de Tránsito]", "[[TRG] Póliza Seguro Todo Riesgo]", "[[RCE] Póliza Civil Extracontractual]", "[SOAT] Seguro Obligatorio", "[[RTM] Revisión Técnico-mecánica]", "[Cédula de Ciudadanía - Conductor]", "[Licencia de Conducción - Conductor]", "[Seguro del Conductor (ARL - EPS)]"],
+    "INVENTARIO": ["[Radio]", "[Parlantes]", "[Antena]", "[Encendedor]", "[Forros]", "[Tapetes]", "[Botiquín]", "[Kit Ambiental]", "[Extintor reglamentario]", "[Linterna]", "[Chaleco reflectivo]", "[Llanta repuesto]", "[Señales]", "[Tacos]", "[Conos]", "[Herramientas (Alicate, destornillador, llave fija, llave expansión) ]", "[Copas]", "[Llave pernos (cruceta)]", "[Gato]"]
+  };
+
+  const pregMoto = {
+    "INSPECCIÓN": ["[Manubrio]", "[Llantas (labrado) y Rines]", "[Funcionamiento del PITO]", "[Luces Delantera Alta/Baja]", "[Luz de Freno]", "[Luces de Direccional]", "[Stop]", "[Retrovisores]", "[Freno Delantero]", "[Freno trasero]", "[Sistema de Embrague (Clutch)]", "[Cadena]", "[Calapiés]", "[Velocímetro]", "[Odómetro (km)]", "[Nivel de Gasolina]", "[Nivel de Aceite]", "[Batería]", "[Limpieza de la Motocicleta]", "[Elementos de protección personal]", "[Casco de Seguridad]"]
+  };
+
+  const pregAdicionales = {
+    "EQUIPO ADICIONAL / REMOLQUE": ["[Defensa trasera]", "[Guardapolvos]", "[Martillos o monas]", "[Avisos de carga]", "[Bandas tensoras]", "[Luces]", "[Estado de las guayas, eslingas, poleas, rodillos]", "[Existen perdidas en sistema hidraulico]", "[Extensión y manipulación de gatos de estabilización]", "[Winche o grúa hidráulica cuenten con extintor de incendios apropiado.]", "[Pasadores, clavijas, cerrojos, ganchos y dispositivos de retención y ayudas para la operación.]", "[Tope de la pluma o brazo hidraúlico y el cuadernal de gancho para detectar signos de desgaste.]", "[Operación y graduación apropiada de los mandos de operación del brazo hidraúlico, levante y el de suspensión del gancho.]", "[Pito y alarma de retroceso y maniobra.]", "[Inspeccione la zona de trabajo e identifique los impedimentos y peligros que existen en el lugar.]", "[Estado del terreno.]", "[Patas y/o Gatos]", "[Bicicleteros]", "[Chasis]", "[Muelles]", "[Conexiones electricas y aire]", "[Frenos]", "[King Pin]", "[Bujes balancines]"]
+  };
+
+  function renderizar(diccionario, contenedorId) {
+    let html = "";
+    for (const cat in diccionario) {
+      html += `<details class="seccion"><summary>${cat}</summary><div style="padding-top:10px;">`;
+      diccionario[cat].forEach(item => {
+        html += `<label style="font-weight:normal;">${item}</label>
+                 <select id="${item}">
+                   <option value="BUEN ESTADO">BUEN ESTADO</option>
+                   <option value="MAL ESTADO">MAL ESTADO</option>
+                   <option value="N/A">N/A</option>
+                 </select>`;
+      });
+      html += `</div></details>`;
+    }
+    document.getElementById(contenedorId).innerHTML = html;
+  }
+
+  renderizar(pregVehiculo, 'preguntasVehiculo');
+  renderizar(pregMoto, 'preguntasMoto');
+  renderizar(pregAdicionales, 'preguntasAdicionales');
+
+  function manejarTipoActivo() {
+    const tipo = document.getElementById('tipoActivo').value;
+    const placaBox = document.getElementById('placa');
+    placaBox.innerHTML = '<option value="">Seleccione...</option>';
+    
+    document.getElementById('seccionInspeccionVehiculo').classList.add('oculto');
+    document.getElementById('seccionInspeccionMoto').classList.add('oculto');
+    document.getElementById('cierreInspeccion').classList.add('oculto');
+    document.getElementById('boxPlaca').classList.add('oculto');
+
+    if (tipo && dataPlacas[tipo]) {
+      dataPlacas[tipo].forEach(p => placaBox.innerHTML += `<option value="${p}">${p}</option>`);
+      document.getElementById('boxPlaca').classList.remove('oculto');
+      document.getElementById('cierreInspeccion').classList.remove('oculto');
+      
+      if (tipo === 'MOTOCICLETA') {
+        document.getElementById('seccionInspeccionMoto').classList.remove('oculto');
+      } else {
+        document.getElementById('seccionInspeccionVehiculo').classList.remove('oculto');
+      }
+    }
+  }
+
+  function manejarEquipoAdicional() {
+    const val = document.getElementById('equipoAdicional').value;
+    document.getElementById('boxMarcaGrua').classList.add('oculto');
+    document.getElementById('boxPlacaRemolque').classList.add('oculto');
+    document.getElementById('preguntasAdicionales').classList.add('oculto');
+
+    if (val === 'GRÚA / CANASTA') {
+      document.getElementById('boxMarcaGrua').classList.remove('oculto');
+      document.getElementById('preguntasAdicionales').classList.remove('oculto');
+    } else if (val === 'SEMIREMOLQUE') {
+      document.getElementById('boxPlacaRemolque').classList.remove('oculto');
+      document.getElementById('preguntasAdicionales').classList.remove('oculto');
+    }
+  }
+
+  function getBase64Comprimido(file, cb) {
+    if (!file) { cb(""); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const MAX = 800; let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round((h * MAX) / w); w = MAX; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.6));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  document.getElementById('formFT230').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnEnviar');
+    btn.innerText = "Guardando localmente..."; btn.disabled = true;
+
+    getBase64Comprimido(document.getElementById('fotoOdometro').files[0], b64Odo => {
+      getBase64Comprimido(document.getElementById('fotoHorometro').files[0], b64Horo => {
+        getBase64Comprimido(document.getElementById('fotoNovedad').files[0], b64Nov => {
+          let respuestas = {};
+          document.querySelectorAll('select').forEach(sel => {
+            if (sel.id.includes('[')) respuestas[sel.id] = sel.value;
+          });
+
+          const registro = {
+            id: Date.now(),
+            email: document.getElementById('email').value,
+            operador: document.getElementById('operador').value,
+            obra: document.getElementById('obra').value,
+            tipoActivo: document.getElementById('tipoActivo').value,
+            placa: document.getElementById('placa').value,
+            equipoAdicional: document.getElementById('equipoAdicional').value,
+            marcaRemolque: document.getElementById('marcaRemolque').value,
+            placaRemolque: document.getElementById('placaRemolque').value,
+            estado: document.getElementById('estado').value,
+            novedades: document.getElementById('novedades').value,
+            fotoOdometro: b64Odo, fotoHorometro: b64Horo, fotoNovedad: b64Nov,
+            inspeccion: respuestas
+          };
+
+          let locales = JSON.parse(localStorage.getItem('ft230_data') || '[]');
+          locales.push(registro);
+          localStorage.setItem('ft230_data', JSON.stringify(locales));
+
+          document.getElementById('formFT230').reset();
+          manejarTipoActivo(); manejarEquipoAdicional();
+          btn.innerText = "Guardar Inspección"; btn.disabled = false;
+          alert('¡Guardado localmente!');
+          actualizarEstado();
+        });
+      });
+    });
+  });
+
+  let sincro = false;
+  async function sincronizarDatos() {
+    if (!navigator.onLine || sincro) return;
+    let locales = JSON.parse(localStorage.getItem('ft230_data') || '[]');
+    if (locales.length === 0) return;
+    sincro = true;
+
+    try {
+      const res = await fetch(URL_APPS_SCRIPT, { method: 'POST', body: JSON.stringify(locales[0]) });
+      const json = await res.json();
+      if (json && json.exito) {
+        let pendientes = JSON.parse(localStorage.getItem('ft230_data') || '[]');
+        pendientes.shift();
+        localStorage.setItem('ft230_data', JSON.stringify(pendientes));
+        actualizarEstado(); sincronizarDatos();
+      }
+    } catch (err) {} finally { sincro = false; }
+  }
+
+  function actualizarEstado() {
+    const b = document.getElementById('statusBanner');
+    if (navigator.onLine) {
+      b.textContent = 'Conectado. Sincronización activa'; b.className = 'status online'; sincronizarDatos();
+    } else {
+      b.textContent = 'Sin internet. Modo Offline.'; b.className = 'status offline';
+    }
+    document.getElementById('contador').innerText = JSON.parse(localStorage.getItem('ft230_data') || '[]').length;
+  }
+
+  window.addEventListener('online', actualizarEstado); window.addEventListener('offline', actualizarEstado);
+  if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js')); }
+  actualizarEstado();
+</script>
+</body>
+</html>
