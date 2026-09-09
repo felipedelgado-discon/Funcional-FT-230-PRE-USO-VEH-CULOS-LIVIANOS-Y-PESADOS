@@ -133,7 +133,6 @@
 </div>
 
 <script>
-  // ¡IMPORTANTE! REEMPLAZA ESTA URL POR LA NUEVA URL PUBLICADA DE TU APPS SCRIPT FT-230
   const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwJnvu09oPbFK0a5cH9mn6sgw7LfbkIw4rffTwxSQdtDXcN61GnSR09k4lfycu06Rs8pg/exec";
 
   const dataPlacas = {
@@ -246,9 +245,16 @@
     getBase64Comprimido(document.getElementById('fotoOdometro').files[0], b64Odo => {
       getBase64Comprimido(document.getElementById('fotoHorometro').files[0], b64Horo => {
         getBase64Comprimido(document.getElementById('fotoNovedad').files[0], b64Nov => {
+          
           let respuestas = {};
           document.querySelectorAll('select').forEach(sel => {
-            if (sel.id.includes('[')) respuestas[sel.id] = sel.value;
+            if (sel.id.includes('[')) {
+              if (sel.closest('.oculto')) {
+                respuestas[sel.id] = 'N/A';
+              } else {
+                respuestas[sel.id] = sel.value;
+              }
+            }
           });
 
           const registro = {
@@ -289,15 +295,29 @@
     sincro = true;
 
     try {
-      const res = await fetch(URL_APPS_SCRIPT, { method: 'POST', body: JSON.stringify(locales[0]) });
+      const res = await fetch(URL_APPS_SCRIPT, { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(locales[0]) 
+      });
+      
       const json = await res.json();
+      
       if (json && json.exito) {
         let pendientes = JSON.parse(localStorage.getItem('ft230_data') || '[]');
         pendientes.shift();
         localStorage.setItem('ft230_data', JSON.stringify(pendientes));
-        actualizarEstado(); sincronizarDatos();
+        actualizarEstado(); 
+        sincronizarDatos();
+      } else {
+        console.error("Respuesta del servidor:", json);
+        alert("Error en Apps Script: " + (json.error || "Revisa la consola"));
       }
-    } catch (err) {} finally { sincro = false; }
+    } catch (err) {
+      console.error("Fallo de red o CORS:", err);
+    } finally { 
+      sincro = false; 
+    }
   }
 
   function actualizarEstado() {
