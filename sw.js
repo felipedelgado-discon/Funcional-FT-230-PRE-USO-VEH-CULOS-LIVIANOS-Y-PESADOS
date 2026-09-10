@@ -1,15 +1,15 @@
-const CACHE_NAME = 'ft230-v3';
-// Aquí definimos los archivos que el celular debe descargar
+const CACHE_NAME = 'ft230-v4';
 const urlsToCache = [
   './',
-  './index.html'
+  './index.html',
+  './manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Guardando en caché el HTML');
+        console.log('Guardando en caché el HTML y Manifest');
         return cache.addAll(urlsToCache);
       })
   );
@@ -26,12 +26,10 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Ignorar Apps Script
   if (e.request.url.includes('script.google.com')) {
     e.respondWith(fetch(e.request));
     return;
   }
-  // Servir el HTML desde la memoria caché
   e.respondWith(
     caches.match(e.request).then(response => {
       return response || fetch(e.request);
