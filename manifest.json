@@ -1,0 +1,8 @@
+{
+  "name": "Pre-Uso Vehículos FT-230",
+  "short_name": "FT-230",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0056b3"
+}
