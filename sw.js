@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ft230-v5';
+const CACHE_NAME = 'ft230-v6'; // Versión actualizada para forzar la descarga
 const urlsToCache = [
   './',
   './index.html',
@@ -6,14 +6,10 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Guardando en caché el HTML y Manifest');
-        return cache.addAll(urlsToCache);
-      })
-  );
   self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
 });
 
 self.addEventListener('activate', (e) => {
