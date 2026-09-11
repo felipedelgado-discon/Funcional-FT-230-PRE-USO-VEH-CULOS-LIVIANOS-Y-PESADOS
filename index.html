@@ -249,7 +249,6 @@
           
           let respuestas = {};
           
-          // Fuerza el N/A a cualquier elemento dentro de un div con clase 'oculto'
           document.querySelectorAll('select').forEach(sel => {
             if (sel.id.includes('[')) {
               if (sel.closest('.oculto')) {
@@ -260,14 +259,17 @@
             }
           });
 
-          // Función para limpiar campos estáticos ocultos
           const checkOculto = (id) => {
             const el = document.getElementById(id);
             return el.closest('.oculto') ? 'N/A' : (el.value || 'N/A');
           };
 
+          const ahora = new Date();
+          const fechaHoraLocal = ahora.toLocaleDateString('es-CO') + " a las " + ahora.toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'});
+
           const registro = {
             id: Date.now(),
+            fechaCaptura: fechaHoraLocal,
             email: document.getElementById('email').value,
             operador: document.getElementById('operador').value,
             obra: document.getElementById('obra').value,
