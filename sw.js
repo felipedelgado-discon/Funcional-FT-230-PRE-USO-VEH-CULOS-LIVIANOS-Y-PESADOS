@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ft230-v6'; // Versión actualizada para forzar la descarga
+const CACHE_NAME = 'ft230-v8';
 const urlsToCache = [
   './',
   './index.html',
@@ -6,16 +6,24 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', (e) => {
-  self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(
+        keys.map(k => {
+          // SOLO borra las memorias viejas del ft230, ignora las demás
+          if (k.startsWith('ft230-') && k !== CACHE_NAME) {
+            return caches.delete(k);
+          }
+        })
+      )
     )
   );
   return self.clients.claim();
